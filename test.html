@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas AI - Feature Tests</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Atlas AI Feature Tests</h1>
+        
+        <section class="test-section">
+            <h2>Ollama API Connection</h2>
+            <button id="test-connection">Test Connection</button>
+            <div id="connection-result"></div>
+        </section>
+        
+        <section class="test-section">
+            <h2>IndexedDB Storage</h2>
+            <button id="test-storage">Test Storage</button>
+            <div id="storage-result"></div>
+        </section>
+        
+        <section class="test-section">
+            <h2>Voice Recognition</h2>
+            <button id="test-voice">Test Voice</button>
+            <div id="voice-result"></div>
+        </section>
+        
+        <section class="test-section">
+            <h2>PDF Parsing</h2>
+            <input type="file" id="test-pdf" accept=".pdf">
+            <div id="pdf-result"></div>
+        </section>
+        
+        <section class="test-section">
+            <h2>Theme Toggle</h2>
+            <button id="test-theme">Toggle Theme</button>
+        </section>
+    </div>
+    
+    <script src="scripts/ollama-api.js"></script>
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/voice.js"></script>
+    <script src="scripts/fileReader.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Storage.init();
+            Voice.init();
+            
+            // Test connections
+            document.getElementById('test-connection').addEventListener('click', async () => {
+                try {
+                    const models = await OllamaAPI.listModels();
+                    document.getElementById('connection-result').textContent = 
+                        `Success! Available models: ${models.map(m => m.name).join(', ')}`;
+                    document.getElementById('connection-result').style.color = 'var(--success)';
+                } catch (error) {
+                    document.getElementById('connection-result').textContent = 
+                        `Error: ${error.message}`;
+                    document.getElementById('connection-result').style.color = 'var(--error)';
+                }
+            });
+            
+            // Test storage
+            document.getElementById('test-storage').addEventListener('click', async () => {
+                try {
+                    const chatId = await Storage.createChat('Test Chat');
+                    await Storage.addMessageToChat(chatId, 'user', 'Test message');
+                    const chat = await Storage.getChat(chatId);
+                    
+                    document.getElementById('storage-result').textContent = 
+                        `Success! Chat created with ${chat.messages.length} message(s)`;
+                    document.getElementById('storage-result').style.color = 'var(--success)';
+                } catch (error) {
+                    document.getElementById('storage-result').textContent = 
+                        `Error: ${error.message}`;
+                    document.getElementById('storage-result').style.color = 'var(--error)';
+                }
+            });
+            
+            // Test voice
+            document.getElementById('test-voice').addEventListener('click', () => {
+                if (Voice.recognition) {
+                    Voice.startListening();
+                    document.getElementById('voice-result').textContent = 'Listening... say something';
+                } else {
+                    document.getElementById('voice-result').textContent = 'Web Speech API not supported';
+                    document.getElementById('voice-result').style.color = 'var(--error)';
+                }
+            });
+            
+            // Test PDF
+            document.getElementById('test-pdf').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const text = await FileReader.extractTextFromPDF(file);
+                        document.getElementById('pdf-result').textContent = 
+                            `Success! First 200 chars: ${text.substring(0, 200)}...`;
+                        document.getElementById('pdf-result').style.color = 'var(--success)';
+                    } catch (error) {
+                        document.getElementById('pdf-result').textContent = 
+                            `Error: ${error.message}`;
+                        document.getElementById('pdf-result').style.color = 'var(--error)';
+                    }
+                }
+            });
+            
+            // Test theme
+            document.getElementById('test-theme').addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+            });
+        });
+    </script>
+</body>
+</html>

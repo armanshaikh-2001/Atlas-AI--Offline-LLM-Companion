@@ -1,0 +1,36 @@
+{
+    "name": "Atlas AI – Offline LLM Companion",
+    "short_name": "Atlas AI",
+    "description": "A fully offline AI assistant powered by Ollama",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "assets/logo-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "assets/logo-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable any"
+        }
+    ],
+    "categories": ["productivity", "utilities"],
+    "shortcuts": [
+        {
+            "name": "New Chat",
+            "url": "/?new-chat",
+            "description": "Start a new conversation"
+        },
+        {
+            "name": "Continue Last Chat",
+            "url": "/?last-chat",
+            "description": "Continue your last conversation"
+        }
+    ]
+}
